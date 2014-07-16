@@ -34,10 +34,9 @@ Then, all the workflow logic is handled by two scripts included in this reposito
 Both scripts should work for your project with any modifications. Please refer to comments in the
 scripts for description of the internals. The only configuration that is needed for the scripts
 to work is GitHub API token, that you can create in 'Personal access tokens' section of
-[your account settings](https://github.com/settings/applications).
-
-It then needs to be included in the environment variables of your `shippable.yml` as `GITHUB_API_KEY`.
-We strongly recommend to add this variable as a secure (encrypted) one.
+[your account settings](https://github.com/settings/applications). It then needs to be included
+in the environment variables of your `shippable.yml` as `GITHUB_API_KEY`.  We strongly recommend
+to add this variable as a secure (encrypted) one.
 
 For more detailed documentation on Heroku deployment, please see Shippable's continuous
 deployment section: http://docs.shippable.com/en/latest/config.html#continuous-deployment
