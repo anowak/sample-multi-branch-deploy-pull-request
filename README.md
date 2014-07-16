@@ -5,6 +5,7 @@ This sample demonstrates how to setup continuous integration and deployment of a
 project with multiple Heroku environments. After the build is triggered by the webhook and the
 project builds successfully, it is first deployed to the staging environment (separate Heroku app).
 
+S
 Then (likely after QA team performs acceptance tests), it can be manually pushed to the production
 environment, which (again) is a separate Heroku application. This behavior is achieved by keeping
 an extra branch (here called `production`) that points to the most recent build/commit approved 
