@@ -5,11 +5,14 @@ This sample demonstrates how to setup continuous integration and deployment of a
 project with multiple Heroku environments. After the build is triggered by the webhook and the
 project builds successfully, it is first deployed to the staging environment (separate Heroku app).
 
-S
-Then (likely after QA team performs acceptance tests), it can be manually pushed to the production
-environment, which (again) is a separate Heroku application. This behavior is achieved by keeping
-an extra branch (here called `production`) that points to the most recent build/commit approved 
-(or 'promoted') for the production environment.
+At the same time, we tag the build with Shippable build number and issue a pull request to a
+special `production` branch that lives in the same repository. 
+
+Then (likely after QA team performs acceptance tests), the pull request can be accepted, which
+will effect in deployment of the associated build to the production environment, which (again)
+is a separate Heroku application. Using GitHub pull request to trigger the deployment also
+creates an opportunity to discuss the status of the build in comments, perform code review
+etc.
 
 Shippable configuration
 -----------------------
@@ -20,42 +23,20 @@ To be able to deploy to two Heroku applications, we need to add two separate rem
     - git remote -v | grep ^staging || heroku git:remote --remote staging --app $STAGING_APP_NAME
     - git remote -v | grep ^production || heroku git:remote --remote production --app $PROD_APP_NAME
 
-Then in `after_success` step, we can check on which branch we are currently and choose the correct
-remote:
+Then, all the workflow logic is handled by two scripts included in this repository: `deploy.sh` and
+`github_promotion.sh` (that is invoked by `deploy.sh`).
 
-    - >
-      [[ $BRANCH = 'production' ]] && REMOTE=production || REMOTE=staging
-    - git push -f $REMOTE master
+    after_success:
+      - ./node_modules/.bin/istanbul cover grunt -- -u tdd
+      - ./node_modules/.bin/istanbul report cobertura --dir  shippable/codecoverage/
+      - ./deploy.sh
 
-(note that we use `>`, so square brackets don't get interpreted by YAML parser)
-
-Example workflow
-----------------
-
-This config can be then leveraged in a workflow like following. 
-
-Assume that the developers work on `master` branch:
-
-    git checkout master
-    git add changes
-    git commit -m "New shiny feature"
-    git push
-
-This commit will then trigger build on Shippable and get deployed to the Heroku app designated by
-`STAGING_APP_NAME` environment variable. Now imagine this change gets accepted by QA team, but 
-some other changes that arrived on `master` in the meantime are still to be tested:
-
-    git add other_changes
-    git commit -m "Another feature"
-    git push
-
-To manually deploy the shiny feature to the production, the developer would proceed as follows:
-
-    git branch -f production 0de23d7 # hash of the commit that we want to deploy
-    git push -f origin production
-
-Now the build gets launched for `production` branch and the `shippable.yml` config above deploys
-this specific commit to the production environment.
+Both scripts should work for your project with any modifications. Please refer to comments in the
+scripts for description of the internals. The only configuration that is needed for the scripts
+to work is GitHub API token, that you can create in 'Personal access tokens' section of
+[your account settings](https://github.com/settings/applications). It then needs to be included
+in the environment variables of your `shippable.yml` as `GITHUB_API_KEY`.  We strongly recommend
+to add this variable as a secure (encrypted) one.
 
 For more detailed documentation on Heroku deployment, please see Shippable's continuous
 deployment section: http://docs.shippable.com/en/latest/config.html#continuous-deployment
