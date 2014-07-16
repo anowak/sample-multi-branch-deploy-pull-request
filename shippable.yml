@@ -27,5 +27,4 @@ before_script:
 after_success:
   - ./node_modules/.bin/istanbul cover grunt -- -u tdd
   - ./node_modules/.bin/istanbul report cobertura --dir  shippable/codecoverage/
-  - echo $PULL_REQUEST
   - ./deploy.sh
