@@ -33,12 +33,12 @@ after_success:
   - >
     if [[ $REMOTE = 'staging' ]]; then
       BUILD_TAG="build-$BUILD_NUMBER"
-      git tag $BUILD_TAG
+      git tag $BUILD_TAG -m "[skip ci] Shippable build #${BUILD_NUMBER}"
       ssh-agent bash -c "ssh-add ~/keys/id_${JOB_ID}; git push origin $BUILD_TAG"
       PULL_REQUEST=$(printf \
         '{"title": "Deploy build %d to production", "head": "%s", "base": "production"}' \
         $BUILD_NUMBER $BUILD_TAG)
       curl -H "Authorization: token $GITHUB_API_KEY" \
-           -XPOST https://api.github.com/repos/anowak/sample-multi-branch-deploy/pulls \
+           -XPOST https://api.github.com/repos/anowak/sample-multi-branch-deploy-pull-request/pulls \
            -d "$PULL_REQUEST"
     fi
