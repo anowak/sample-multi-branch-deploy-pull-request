@@ -27,10 +27,4 @@ before_script:
 after_success:
   - ./node_modules/.bin/istanbul cover grunt -- -u tdd
   - ./node_modules/.bin/istanbul report cobertura --dir  shippable/codecoverage/
-  - echo $PULL_REQUEST
-  - [[ $PULL_REQUEST != 'none' ]] && exit 0
-  - >
-    [[ $BRANCH = 'production' ]] && REMOTE=production || REMOTE=staging
-  - git push -f $REMOTE master
-  - >
-    [[ $REMOTE = 'staging' ]] && ./github_promotion.sh
+  - ./deploy.sh
