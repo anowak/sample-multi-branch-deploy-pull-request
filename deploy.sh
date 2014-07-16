@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # if this build is triggered by pull request, exit without deploying
-[[ $PULL_REQUEST != 'none' ]] && exit 0
+[[ $PULL_REQUEST != 'None' ]] && exit 0
 
 # determine target environment based on the branch name
 [[ $BRANCH = 'production' ]] && REMOTE=production || REMOTE=staging
