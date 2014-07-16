@@ -12,6 +12,7 @@ env:
     - MONGOLAB_URI=mongodb://localhost/test
     - XUNIT_FILE=shippable/testresults/result.xml
     - secure: MRuHkLbL9HPkJPU5lzkKM1+NOq1S5RrhxEyhJkk60xxYiF7DMzydiBN8oFBjWrSmyGeGRuEC22a0I5ItobdWVszfcJCaXHwtfKzfGOUdKuyCnDgvojXhv/jrBvULyLK6zsLw3b8NMxdnwNsHqSPm19qW/EIGEl9Zv/637Igos69z9aT7+xrEG013+6HtKYb8RHm+iPSNsFoBi/RSAHYuM1eLTZWG2WAkjgzZaYmrHCgNwVmk+HOGR+TOWN7Iu5lrjyvC1XDCQrOvo1hZI30cd9OqJ5aadFm3exQpNhI4I7AgOnCbK3NoWNc/GAnqKXCvsaIQ80Jd/uLIOVyMjD6Xmg==
+    - secure: 0ANuQLjcTjpSnuP6IRp/RRdkIb21A9rJuRYqIXhwaE+LqyVUYhVjmwO+jHOxi8nSxnRZTuKKuidpI8uRnrsrkPEHS9me6IOiuI3yud30X9JrwiJqSqxQ6t1HeaclqFN746fDs6T5KQtk5YwOMdePEdf8eu2YDhni6Bmggdb1ZZD6HuAUb2jHwS/hrfPtX0sgiCsv/YAqfIane4iAZlFkai8PnYQDVvQ3hBfIpbzplIucvfrAIx4CSHycg1VDITtnH6ib/i4udPw98C7AU9B8v8oPNJISyw5uEgHcj6Ew6LdJwwMMqjF6356HD5u5PNIMcP3tLkv+QLkJl6JslxjnPA==
 
 before_install:
   - which heroku || wget -qO- https://toolbelt.heroku.com/install-ubuntu.sh | sh
@@ -29,3 +30,15 @@ after_success:
   - >
     [[ $BRANCH = 'production' ]] && REMOTE=production || REMOTE=staging
   - git push -f $REMOTE master
+  - >
+    if [[ $REMOTE = 'staging' ]]; then
+      BUILD_TAG="build-$BUILD_NUMBER"
+      git tag $BUILD_TAG
+      git push origin $BUILD_TAG
+      PULL_REQUEST=$(printf \
+        '{"title": "Deploy build %d to production", "head": "%s", "base": "production"}' \
+        $BUILD_NUMBER $BUILD_TAG)
+      curl -H "Authorization: token $GITHUB_API_KEY" \
+           -XPOST https://api.github.com/repos/anowak/sample-multi-branch-deploy/pulls \
+           -d "$PULL_REQUEST"
+    fi
