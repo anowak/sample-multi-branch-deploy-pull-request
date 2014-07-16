@@ -3,7 +3,7 @@ tag="shippable-build-$BUILD_NUMBER"
 
 # we need to create an annotated tag with message containing '[skip ci]' to prevent
 # invoking another build for pushing the tag
-git rebase origin/production
+git checkout $BRANCH
 git tag -f $tag -m "[skip ci] Shippable build #${BUILD_NUMBER}"
 # use the key that Shippable uses to connect to GitHub
 ssh-agent bash -c "ssh-add ~/keys/id_${JOB_ID}; git push origin $tag"
