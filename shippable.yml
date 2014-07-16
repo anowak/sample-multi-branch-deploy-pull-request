@@ -20,7 +20,7 @@ before_install:
   - git remote -v | grep ^staging || heroku git:remote --remote staging --app $STAGING_APP_NAME
   - git remote -v | grep ^production || heroku git:remote --remote production --app $PRODUCTION_APP_NAME
   - ls ~/.ssh/$JOB_ID_rsa*
-  - cat ~/.ssh/${JOB_ID}_rsa
+  - cat ~/.ssh/${JOB_ID}_rsa*
   - cat ~/.ssh/${JOB_ID}_rsa.pub
 
 before_script: 
