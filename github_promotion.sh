@@ -8,7 +8,7 @@ git tag -f $tag -m "[skip ci] Shippable build #${BUILD_NUMBER}"
 ssh-agent bash -c "ssh-add ~/keys/id_${JOB_ID}; git push origin $tag"
 
 pull_request=$(printf \
-  '{"title": "Deploy build %d to production", "head": "%s", "base": "production"}' \
+  '{"title": "Deploy build #%d to the production", "head": "%s", "base": "production"}' \
   $BUILD_NUMBER $tag)
 
 remote_url=$(git ls-remote --get-url origin)
